@@ -24,7 +24,8 @@ android {
         applicationId = "com.example.navirail_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // ARCore requires minSdkVersion 24 or higher.
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -41,4 +42,10 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.ar:core:1.45.0")
+    implementation("com.gorisse.thomas.sceneform:sceneform:1.23.0")
 }

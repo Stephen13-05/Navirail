@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primaryDeepBlue = Color(0xFF0A3D62);
+  static const Color primaryDeepBlue = Color(0xFF3396FF); // primary brand blue
   static const Color secondaryRailwayGreen = Color(0xFF1ABC9C);
   static const Color accentSafetyYellow = Color(0xFFF1C40F);
-  static const Color brandLightBlue = Color(0xFF60A5FA); // light blue for highlights
+  static const Color brandLightBlue = Color(0xFF7FB7FF); // lighter blue for highlights
 
   static const Color neutralWhite = Colors.white;
   static const Color neutralLightGrey = Color(0xFFF4F5F7);
@@ -63,6 +63,35 @@ class AppShadows {
       offset: const Offset(0, 12),
     ),
   ];
+}
+
+class AppGradientBackground extends StatelessWidget {
+  const AppGradientBackground({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            Color(0xFF3DBBFF),      // strong blue in the corner
+            Color(0xFFEAF6FF),      // light blue transition
+            AppColors.neutralWhite, // rest of the screen white
+          ],
+          stops: [
+            0.0,
+            0.35,
+            0.8,
+          ],
+        ),
+      ),
+      child: child,
+    );
+  }
 }
 
 class AppTextStyles {

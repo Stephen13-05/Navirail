@@ -38,42 +38,75 @@ class FindMyTrainPage extends StatefulWidget {
 }
 
 class _FindMyTrainPageState extends State<FindMyTrainPage> {
-  final _search = TextEditingController();
+  final _trainSearch = TextEditingController();
+  final _fromSearch = TextEditingController();
+  final _toSearch = TextEditingController();
   final _focus = FocusNode();
   bool _loading = false;
   bool _platformPulse = false;
+  int _searchType = 0; // 0 for train search, 1 for route search
   List<String> _recents = [
-    '12028 Shatabdi',
+    '12028 Shatabdi Express',
     '16516 SBC → CAN',
     '12627 KSR → MAS',
+    '22125 Vande Bharat',
+    'SBC → NDLS',
   ];
   List<TrainItem> _results = [];
 
   @override
   void dispose() {
-    _search.dispose();
+    _trainSearch.dispose();
+    _fromSearch.dispose();
+    _toSearch.dispose();
     _focus.dispose();
     super.dispose();
   }
 
   void _onVoice() {}
 
-  void _onSearchChanged(String q) async {
+  void _onTrainSearchChanged(String q) async {
     setState(() => _loading = true);
     await Future.delayed(const Duration(milliseconds: 500));
     final data = _sampleData();
     final lower = q.trim().toLowerCase();
     List<TrainItem> filtered;
-    if (lower.contains('→') || lower.contains('->')) {
-      final parts = lower.replaceAll('->', '→').split('→');
-      final from = parts.first.trim();
-      final to = parts.length > 1 ? parts[1].trim() : '';
-      filtered = data.where((t) => t.fromCode.toLowerCase().contains(from) && t.toCode.toLowerCase().contains(to)).toList();
+    
+    if (lower.isEmpty) {
+      filtered = [];
     } else {
       filtered = data.where((t) =>
           t.number.toLowerCase().contains(lower) ||
-          t.name.toLowerCase().contains(lower)).toList();
+          t.name.toLowerCase().contains(lower)
+      ).toList();
     }
+    
+    setState(() {
+      _results = filtered;
+      _loading = false;
+    });
+  }
+
+  void _onRouteSearchChanged() async {
+    final from = _fromSearch.text.trim().toLowerCase();
+    final to = _toSearch.text.trim().toLowerCase();
+    
+    if (from.isEmpty || to.isEmpty) {
+      setState(() {
+        _results = [];
+      });
+      return;
+    }
+    
+    setState(() => _loading = true);
+    await Future.delayed(const Duration(milliseconds: 500));
+    final data = _sampleData();
+    
+    final filtered = data.where((t) => 
+      t.fromCode.toLowerCase().contains(from) && 
+      t.toCode.toLowerCase().contains(to)
+    ).toList();
+    
     setState(() {
       _results = filtered;
       _loading = false;
@@ -83,6 +116,7 @@ class _FindMyTrainPageState extends State<FindMyTrainPage> {
   List<TrainItem> _sampleData() {
     final now = DateTime.now();
     return [
+      // Premium Trains
       TrainItem(
         number: '12028',
         name: 'Shatabdi Express',
@@ -96,6 +130,43 @@ class _FindMyTrainPageState extends State<FindMyTrainPage> {
         platform: '5',
       ),
       TrainItem(
+        number: '22691',
+        name: 'Rajdhani Express',
+        fromCode: 'SBC',
+        toCode: 'NDLS',
+        dep: DateTime(now.year, now.month, now.day, 20, 0),
+        arr: DateTime(now.year, now.month, now.day + 1, 11, 0),
+        expDep: null,
+        expArr: null,
+        status: TrainStatus.onTime,
+        platform: '1',
+      ),
+      TrainItem(
+        number: '12627',
+        name: 'Karnataka Express',
+        fromCode: 'SBC',
+        toCode: 'MAS',
+        dep: DateTime(now.year, now.month, now.day, 7, 15),
+        arr: DateTime(now.year, now.month, now.day, 6, 45),
+        expDep: DateTime(now.year, now.month, now.day, 7, 25),
+        expArr: DateTime(now.year, now.month, now.day, 7, 0),
+        status: TrainStatus.minorDelay,
+        platform: '3',
+      ),
+      TrainItem(
+        number: '12685',
+        name: 'Mysuru Express',
+        fromCode: 'MAS',
+        toCode: 'MYS',
+        dep: DateTime(now.year, now.month, now.day, 15, 30),
+        arr: DateTime(now.year, now.month, now.day, 17, 20),
+        expDep: null,
+        expArr: null,
+        status: TrainStatus.onTime,
+        platform: '7',
+      ),
+      // Superfast Trains
+      TrainItem(
         number: '16516',
         name: 'Karwar Express',
         fromCode: 'CAN',
@@ -108,13 +179,149 @@ class _FindMyTrainPageState extends State<FindMyTrainPage> {
         platform: '3',
       ),
       TrainItem(
-        number: '22691',
-        name: 'Rajdhani',
+        number: '12785',
+        name: 'Kacheguda Express',
         fromCode: 'SBC',
-        toCode: 'NDLS',
-        dep: DateTime(now.year, now.month, now.day, 20, 0),
-        arr: DateTime(now.year, now.month, now.day + 1, 11, 0),
-        expDep: DateTime(now.year, now.month, now.day, 21, 30),
+        toCode: 'KCG',
+        dep: DateTime(now.year, now.month, now.day, 18, 45),
+        arr: DateTime(now.year, now.month, now.day + 1, 10, 30),
+        expDep: null,
+        expArr: null,
+        status: TrainStatus.onTime,
+        platform: '2',
+      ),
+      TrainItem(
+        number: '16613',
+        name: 'Coastal Express',
+        fromCode: 'SBC',
+        toCode: 'MAQ',
+        dep: DateTime(now.year, now.month, now.day, 23, 45),
+        arr: DateTime(now.year, now.month, now.day + 1, 13, 30),
+        expDep: null,
+        expArr: null,
+        status: TrainStatus.onTime,
+        platform: '8',
+      ),
+      // Mail/Express Trains
+      TrainItem(
+        number: '56213',
+        name: 'Chennai Passenger',
+        fromCode: 'SBC',
+        toCode: 'MAS',
+        dep: DateTime(now.year, now.month, now.day, 22, 30),
+        arr: DateTime(now.year, now.month, now.day + 1, 9, 15),
+        expDep: DateTime(now.year, now.month, now.day, 22, 45),
+        expArr: DateTime(now.year, now.month, now.day + 1, 9, 30),
+        status: TrainStatus.minorDelay,
+        platform: '6',
+      ),
+      TrainItem(
+        number: '16535',
+        name: 'Gol Gumbaz Express',
+        fromCode: 'SBC',
+        toCode: 'MRJ',
+        dep: DateTime(now.year, now.month, now.day, 14, 15),
+        arr: DateTime(now.year, now.month, now.day, 23, 45),
+        expDep: null,
+        expArr: null,
+        status: TrainStatus.onTime,
+        platform: '4',
+      ),
+      TrainItem(
+        number: '17301',
+        name: 'Mysuru Dharwad Express',
+        fromCode: 'MYS',
+        toCode: 'DWR',
+        dep: DateTime(now.year, now.month, now.day, 6, 30),
+        arr: DateTime(now.year, now.month, now.day, 15, 45),
+        expDep: null,
+        expArr: null,
+        status: TrainStatus.onTime,
+        platform: '1',
+      ),
+      // Chennai to Trichy Route
+      TrainItem(
+        number: '16159',
+        name: 'Chennai Egmore - Tiruchchirappalli Express',
+        fromCode: 'MS',
+        toCode: 'TPJ',
+        dep: DateTime(now.year, now.month, now.day, 8, 30),
+        arr: DateTime(now.year, now.month, now.day, 14, 15),
+        expDep: null,
+        expArr: null,
+        status: TrainStatus.onTime,
+        platform: '3',
+      ),
+      TrainItem(
+        number: '16161',
+        name: 'Chennai Egmore - Tiruchchirappalli Express',
+        fromCode: 'MS',
+        toCode: 'TPJ',
+        dep: DateTime(now.year, now.month, now.day, 20, 45),
+        arr: DateTime(now.year, now.month, now.day + 1, 2, 30),
+        expDep: null,
+        expArr: null,
+        status: TrainStatus.onTime,
+        platform: '7',
+      ),
+      TrainItem(
+        number: '12635',
+        name: 'Chennai - Tiruchchirappalli SF Express',
+        fromCode: 'MAS',
+        toCode: 'TPJ',
+        dep: DateTime(now.year, now.month, now.day, 22, 40),
+        arr: DateTime(now.year, now.month, now.day + 1, 4, 10),
+        expDep: null,
+        expArr: null,
+        status: TrainStatus.minorDelay,
+        platform: '5',
+      ),
+      // Intercity Trains
+      TrainItem(
+        number: '12609',
+        name: 'Intercity Express',
+        fromCode: 'SBC',
+        toCode: 'CBE',
+        dep: DateTime(now.year, now.month, now.day, 10, 15),
+        arr: DateTime(now.year, now.month, now.day, 16, 30),
+        expDep: null,
+        expArr: null,
+        status: TrainStatus.onTime,
+        platform: '9',
+      ),
+      TrainItem(
+        number: '12725',
+        name: 'Intercity SF Express',
+        fromCode: 'SBC',
+        toCode: 'DMM',
+        dep: DateTime(now.year, now.month, now.day, 17, 30),
+        arr: DateTime(now.year, now.month, now.day, 21, 45),
+        expDep: null,
+        expArr: null,
+        status: TrainStatus.onTime,
+        platform: '5',
+      ),
+      // Special Trains
+      TrainItem(
+        number: '22125',
+        name: 'Vande Bharat Express',
+        fromCode: 'SBC',
+        toCode: 'MAS',
+        dep: DateTime(now.year, now.month, now.day, 6, 0),
+        arr: DateTime(now.year, now.month, now.day, 11, 30),
+        expDep: null,
+        expArr: null,
+        status: TrainStatus.onTime,
+        platform: '2',
+      ),
+      TrainItem(
+        number: '12251',
+        name: 'Duronto Express',
+        fromCode: 'SBC',
+        toCode: 'NZM',
+        dep: DateTime(now.year, now.month, now.day, 21, 15),
+        arr: DateTime(now.year, now.month, now.day + 2, 6, 45),
+        expDep: DateTime(now.year, now.month, now.day, 22, 30),
         expArr: null,
         status: TrainStatus.majorDelay,
         platform: '1',
@@ -127,7 +334,7 @@ class _FindMyTrainPageState extends State<FindMyTrainPage> {
     return Scaffold(
       backgroundColor: AppColors.neutralWhite,
       appBar: AppBar(
-        title: Text('KSR Bengaluru', style: AppTextStyles.h5),
+        title: Text('Find My Train', style: AppTextStyles.h5),
         centerTitle: false,
         actions: [
           _LangMenu(),
@@ -140,11 +347,79 @@ class _FindMyTrainPageState extends State<FindMyTrainPage> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: _SearchField(
-                controller: _search,
-                focusNode: _focus,
-                onChanged: _onSearchChanged,
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  // Search Type Toggle
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.neutralLightGrey,
+                      borderRadius: BorderRadius.circular(AppRadius.r12),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setState(() => _searchType = 0),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: _searchType == 0 ? AppColors.primaryDeepBlue : Colors.transparent,
+                                borderRadius: BorderRadius.circular(AppRadius.r12),
+                              ),
+                              child: Text(
+                                'Train Search',
+                                textAlign: TextAlign.center,
+                                style: AppTextStyles.body.copyWith(
+                                  color: _searchType == 0 ? Colors.white : AppColors.neutralDarkGrey,
+                                  fontWeight: _searchType == 0 ? FontWeight.w600 : FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setState(() => _searchType = 1),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              decoration: BoxDecoration(
+                                color: _searchType == 1 ? AppColors.primaryDeepBlue : Colors.transparent,
+                                borderRadius: BorderRadius.circular(AppRadius.r12),
+                              ),
+                              child: Text(
+                                'Route Search',
+                                textAlign: TextAlign.center,
+                                style: AppTextStyles.body.copyWith(
+                                  color: _searchType == 1 ? Colors.white : AppColors.neutralDarkGrey,
+                                  fontWeight: _searchType == 1 ? FontWeight.w600 : FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Train Search
+                  if (_searchType == 0)
+                    _TrainSearchField(
+                      controller: _trainSearch,
+                      focusNode: _focus,
+                      onChanged: _onTrainSearchChanged,
+                    ),
+                  
+                  // Route Search
+                  if (_searchType == 1)
+                    _RouteSearchFields(
+                      fromController: _fromSearch,
+                      toController: _toSearch,
+                      onFromChanged: (_) => _onRouteSearchChanged(),
+                      onToChanged: (_) => _onRouteSearchChanged(),
+                    ),
+                ],
               ),
             ),
             Expanded(
@@ -202,8 +477,12 @@ class _FindMyTrainPageState extends State<FindMyTrainPage> {
 
   Widget _buildContent() {
     if (_loading) return _SkeletonList();
-    if (_search.text.trim().isEmpty) return _EmptyState(recents: _recents, onTapRecent: _onSearchChanged);
-    if (_results.isEmpty) return _NoResults(query: _search.text, onTry: _onSearchChanged);
+    
+    bool hasSearchInput = (_searchType == 0 && _trainSearch.text.trim().isNotEmpty) ||
+                         (_searchType == 1 && _fromSearch.text.trim().isNotEmpty && _toSearch.text.trim().isNotEmpty);
+    
+    if (!hasSearchInput) return _EmptyState(recents: _recents, onTapRecent: _onRecentSearch);
+    if (_results.isEmpty) return _NoResults(query: _getSearchQuery(), onTry: _onRecentSearch);
     return ListView.separated(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: _results.length,
@@ -234,6 +513,34 @@ class _FindMyTrainPageState extends State<FindMyTrainPage> {
     );
   }
 
+  String _getSearchQuery() {
+    if (_searchType == 0) {
+      return _trainSearch.text;
+    } else {
+      return '${_fromSearch.text} → ${_toSearch.text}';
+    }
+  }
+
+  void _onRecentSearch(String query) {
+    if (query.contains('→') || query.contains('->')) {
+      setState(() {
+        _searchType = 1;
+        final parts = query.replaceAll('->', '→').split('→');
+        if (parts.length >= 2) {
+          _fromSearch.text = parts[0].trim();
+          _toSearch.text = parts[1].trim();
+        }
+      });
+      _onRouteSearchChanged();
+    } else {
+      setState(() {
+        _searchType = 0;
+        _trainSearch.text = query;
+      });
+      _onTrainSearchChanged(query);
+    }
+  }
+
   Future<bool?> _openDetails(TrainItem t) async {
     return showModalBottomSheet<bool>(
       context: context,
@@ -246,8 +553,8 @@ class _FindMyTrainPageState extends State<FindMyTrainPage> {
   }
 }
 
-class _SearchField extends StatelessWidget {
-  const _SearchField({required this.controller, required this.focusNode, required this.onChanged});
+class _TrainSearchField extends StatelessWidget {
+  const _TrainSearchField({required this.controller, required this.focusNode, required this.onChanged});
   final TextEditingController controller;
   final FocusNode focusNode;
   final ValueChanged<String> onChanged;
@@ -267,14 +574,80 @@ class _SearchField extends StatelessWidget {
         textInputAction: TextInputAction.search,
         onChanged: onChanged,
         decoration: const InputDecoration(
-          hintText: 'Train no., name, or SBC → MAS',
-          prefixIcon: Icon(Icons.search),
+          hintText: 'Enter train number or name (e.g., 12028, Shatabdi)',
+          prefixIcon: Icon(Icons.train),
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         ),
       ),
+    );
+  }
+}
+
+class _RouteSearchFields extends StatelessWidget {
+  const _RouteSearchFields({
+    required this.fromController,
+    required this.toController,
+    required this.onFromChanged,
+    required this.onToChanged,
+  });
+  final TextEditingController fromController;
+  final TextEditingController toController;
+  final ValueChanged<String> onFromChanged;
+  final ValueChanged<String> onToChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // From Field
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.neutralWhite,
+            borderRadius: BorderRadius.circular(AppRadius.r16),
+            border: Border.all(color: AppColors.cardBorder),
+            boxShadow: AppShadows.low,
+          ),
+          child: TextField(
+            controller: fromController,
+            textInputAction: TextInputAction.next,
+            onChanged: onFromChanged,
+            decoration: const InputDecoration(
+              hintText: 'From (e.g., Chennai, MAS)',
+              prefixIcon: Icon(Icons.location_on),
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        // To Field
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.neutralWhite,
+            borderRadius: BorderRadius.circular(AppRadius.r16),
+            border: Border.all(color: AppColors.cardBorder),
+            boxShadow: AppShadows.low,
+          ),
+          child: TextField(
+            controller: toController,
+            textInputAction: TextInputAction.search,
+            onChanged: onToChanged,
+            decoration: const InputDecoration(
+              hintText: 'To (e.g., Trichy, TPJ)',
+              prefixIcon: Icon(Icons.flag),
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -522,6 +895,81 @@ class _DetailsSheet extends StatelessWidget {
     }
   }
 
+  Widget _buildTimeline(BuildContext context) {
+    final textStyle = AppTextStyles.caption.copyWith(
+      color: AppColors.neutralDarkGrey,
+    );
+
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              children: [
+                const Icon(Icons.radio_button_checked,
+                    size: 16, color: AppColors.success),
+                Container(
+                  width: 2,
+                  height: 22,
+                  color: AppColors.cardBorder,
+                ),
+              ],
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Departed ${item.fromCode} at scheduled time '
+                '${item.dep.hour.toString().padLeft(2, '0')}:${item.dep.minute.toString().padLeft(2, '0')}',
+                style: textStyle,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              children: [
+                const Icon(Icons.location_on,
+                    size: 18, color: AppColors.accentSafetyYellow),
+                Container(
+                  width: 2,
+                  height: 22,
+                  color: AppColors.cardBorder,
+                ),
+              ],
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Currently en route between ${item.fromCode} and ${item.toCode}. Last update a few minutes ago.',
+                style: textStyle,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(Icons.flag,
+                size: 16, color: AppColors.primaryDeepBlue),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Expected arrival at ${item.toCode} around '
+                '${item.arr.hour.toString().padLeft(2, '0')}:${item.arr.minute.toString().padLeft(2, '0')} (demo status only).',
+                style: textStyle,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -596,6 +1044,10 @@ class _DetailsSheet extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
+                      Text('Where is my train?', style: AppTextStyles.h5),
+                      const SizedBox(height: 6),
+                      _buildTimeline(context),
+                      const SizedBox(height: 12),
                       Row(
                         children: [
                           const Icon(Icons.account_tree_outlined),
