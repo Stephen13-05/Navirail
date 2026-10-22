@@ -1,0 +1,55 @@
+{
+  "coordinate_system": {
+    "width_m": 120.0,
+    "height_m": 80.0,
+    "origin": "top-left",
+    "units": "meters"
+  },
+  "nodes": {
+    "entrance_1":       { "x_m": 108.0, "y_m": 8.0 },
+    "ticket_counter":   { "x_m": 108.0, "y_m": 20.0 },
+    "police_station":   { "x_m": 108.0, "y_m": 32.0 },
+    "platform_1":       { "x_m": 96.0,  "y_m": 44.0 },
+    "platform_2":       { "x_m": 66.0,  "y_m": 44.0 },
+    "platform_3":       { "x_m": 42.0,  "y_m": 44.0 },
+    "platform_4":       { "x_m": 18.0,  "y_m": 44.0 },
+    "footbridge_center":{ "x_m": 60.0,  "y_m": 24.0 },
+    "footbridge_left":  { "x_m": 12.0,  "y_m": 24.0 },
+    "footbridge_right": { "x_m": 108.0, "y_m": 24.0 },
+    "fob_stairs":       { "x_m": 60.0,  "y_m": 32.0 },
+    "shops":            { "x_m": 60.0,  "y_m": 38.4 },
+    "small_shops":      { "x_m": 54.0,  "y_m": 38.4 },
+    "guest_room":       { "x_m": 108.0, "y_m": 4.0 },
+    "shop_right":       { "x_m": 108.0, "y_m": 12.0 },
+    "entrance_2":       { "x_m": 12.0,  "y_m": 8.0 }
+  },
+  "areas": {
+    "platform_1_area": { "type": "line", "approx_x_m": 96.0, "y_range_m": [36.0, 52.0] },
+    "platform_2_area": { "type": "line", "approx_x_m": 66.0, "y_range_m": [36.0, 52.0] },
+    "platform_3_area": { "type": "line", "approx_x_m": 42.0, "y_range_m": [36.0, 52.0] },
+    "platform_4_area": { "type": "line", "approx_x_m": 18.0, "y_range_m": [36.0, 52.0] },
+    "footbridge":      { "polygon_m": [[12.0,24.0],[108.0,24.0],[108.0,26.0],[12.0,26.0]] },
+    "concourse":       { "polygon_m": [[12.0,8.0],[108.0,8.0],[108.0,36.0],[12.0,36.0]] }
+  },
+  "edges": [
+    ["entrance_1", "ticket_counter"],
+    ["ticket_counter", "police_station"],
+    ["entrance_1", "footbridge_right"],
+    ["entrance_2", "footbridge_left"],
+    ["footbridge_left", "footbridge_center"],
+    ["footbridge_center", "footbridge_right"],
+    ["footbridge_center", "fob_stairs"],
+    ["fob_stairs", "shops"],
+    ["shops", "platform_2"],
+    ["shops", "platform_3"],
+    ["shops", "platform_1"],
+    ["shops", "platform_4"],
+    ["platform_1", "platform_2"],
+    ["platform_2", "platform_3"],
+    ["platform_3", "platform_4"]
+  ],
+  "notes": {
+    "scale_note": "These coordinates were derived from a 0-100 relative layout scaled to 120×80 meters. They are approximate and intended as a starting map for ARCore/world placement.",
+    "next_steps": "If you want ARCore-ready anchors, provide one real-world reference distance (for example: platform length in meters or distance between entrances) and I will refine coordinates to exact real-world scale and export a JSON with ARCore-friendly transforms."
+  }
+}
