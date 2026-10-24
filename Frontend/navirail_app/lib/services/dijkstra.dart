@@ -16,6 +16,9 @@ class Dijkstra {
   }
 
   List<String> shortestPath(String start, String goal) {
+    if (!graph.nodes.containsKey(start) || !graph.nodes.containsKey(goal)) {
+      return [];
+    }
     final dist = <String, double>{};
     final prev = <String, String?>{};
     final unvisited = <String>{};
@@ -37,12 +40,15 @@ class Dijkstra {
 
       unvisited.remove(current);
 
+      if (dist[current] == double.infinity) break;
+
       if (current == goal) break;
 
       if (!graph.adjacency.containsKey(current)) continue;
 
       // Relax all neighbors
       for (var neighbor in graph.adjacency[current]!) {
+        if (!unvisited.contains(neighbor)) continue;
         double alt = dist[current]! + _distance(current, neighbor);
 
         if (alt < dist[neighbor]!) {
@@ -53,6 +59,7 @@ class Dijkstra {
     }
 
     // Build final path
+    if (dist[goal] == double.infinity) return [];
     List<String> path = [];
     String? node = goal;
 

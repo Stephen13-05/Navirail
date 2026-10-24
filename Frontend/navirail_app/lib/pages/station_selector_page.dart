@@ -1,3 +1,4 @@
+import '../services/station_selection.dart';
 import 'package:flutter/material.dart';
 import '../ui/design_system.dart';
 import 'home_page.dart';
@@ -277,6 +278,8 @@ class _StationTile extends StatelessWidget {
         ),
         trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
         onTap: () {
+          StationSelection.code = station.code;
+          StationSelection.name = station.name;
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (_) => const HomePage(),

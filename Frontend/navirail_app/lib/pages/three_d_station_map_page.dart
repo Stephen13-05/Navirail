@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../ui/design_system.dart';
+import 'station_explorer_stub.dart'
+    if (dart.library.html) 'station_explorer_web.dart';
 
 class ThreeDStationMapPage extends StatefulWidget {
   const ThreeDStationMapPage({super.key});
@@ -61,6 +63,13 @@ class _ThreeDStationMapPageState extends State<ThreeDStationMapPage> {
 
   @override
   Widget build(BuildContext context) {
+    final explorer = buildStationExplorer();
+    if (explorer != null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('NaviRail Station Explorer')),
+        body: explorer,
+      );
+    }
     final visible = _allFacilities
         .where((f) => _filters[f.type] ?? false)
         .toList(growable: false);

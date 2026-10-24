@@ -586,7 +586,7 @@ class _QuickActionsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = [
-      _QuickActionItem('3D Map', Icons.public_outlined),
+      _QuickActionItem('3D Navigation', Icons.public_outlined),
       _QuickActionItem('AR Navigation', Icons.camera_outlined),
       _QuickActionItem('Train Coach Layout', Icons.train_outlined),
       _QuickActionItem('Food & Shops', Icons.restaurant_outlined),
@@ -629,7 +629,7 @@ class _QuickActionCard extends StatelessWidget {
   final _QuickActionItem item;
 
   void _handleTap(BuildContext context) {
-    if (item.label == '3D Map') {
+    if (item.label == '3D Navigation') {
       Navigator.push(
         context,
         MaterialPageRoute(
