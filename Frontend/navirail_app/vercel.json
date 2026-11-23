@@ -1,0 +1,23 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/explorer",
+      "destination": "/explorer/index.html"
+    },
+    {
+      "source": "/explorer/",
+      "destination": "/explorer/index.html"
+    },
+    {
+      "source": "/explorer/((?!assets/|.*\\..*).*)$",
+      "destination": "/explorer/index.html"
+    },
+    {
+      "source": "/((?!explorer|assets|canvaskit|icons|.*\\..*).*)$",
+      "destination": "/index.html"
+    }
+  ]
+}

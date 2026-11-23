@@ -1,0 +1,13 @@
+{
+  "name": "navirail",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "install:explorer": "npm --prefix Frontend/station_explorer ci",
+    "build:explorer": "npm --prefix Frontend/station_explorer run build",
+    "copy:explorer": "node scripts/copy-explorer.js",
+    "build": "npm run install:explorer && npm run build:explorer && npm run copy:explorer",
+    "test": "npm --prefix Frontend/station_explorer run test:routing"
+  }
+}

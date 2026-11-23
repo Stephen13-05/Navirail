@@ -1,0 +1,24 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": false,
+  "trailingSlash": false,
+  "outputDirectory": "Frontend/navirail_app/build/web",
+  "rewrites": [
+    {
+      "source": "/explorer",
+      "destination": "/explorer/index.html"
+    },
+    {
+      "source": "/explorer/",
+      "destination": "/explorer/index.html"
+    },
+    {
+      "source": "/explorer/((?!assets/|.*\\..*).*)$",
+      "destination": "/explorer/index.html"
+    },
+    {
+      "source": "/((?!explorer|assets|canvaskit|icons|.*\\..*).*)$",
+      "destination": "/index.html"
+    }
+  ]
+}
